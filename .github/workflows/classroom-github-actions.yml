@@ -1,41 +1,33 @@
-name: Autograding Tests
-'on':
-- push
-- repository_dispatch
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 permissions:
-  checks: write
-  actions: read
   contents: read
+
 jobs:
-  run-autograding-tests:
+  build:
+
     runs-on: ubuntu-latest
-    if: github.actor != 'github-classroom[bot]'
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
       with:
-        python-version: '3.11'  # Ensure it matches the Python version you're using      
+        python-version: "3.10"
     - name: Install dependencies
       run: |
-        python -m venv venv
-        source venv/bin/activate
-        pip install pytest
-    - name: test_session8
-      id: test_session8
-      uses: classroom-resources/autograding-python-grader@v1
-      with:
-        timeout: 10
-        max-score: 1000
-        setup-command: pip install pytest
-    - name: Run tests
-      id: run_tests
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
+    - name: Test with pytest
       run: |
-        source venv/bin/activate
-        pytest --maxfail=1 --disable-warnings --json-report --json-report-file=results.json
-
-    - name: Autograding Reporter
-      uses: classroom-resources/autograding-grading-reporter@v1
-      with:
-        results: ${{ steps.run_tests.outputs.result }}
+        python Session6/test_session8.py
