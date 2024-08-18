@@ -13,6 +13,15 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/checkout@v4
+      with:
+        python-version: '3.11'  # Ensure it matches the Python version you're using      
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install pytest
     - name: test_session8
       id: test_session8
       uses: classroom-resources/autograding-python-grader@v1
@@ -20,9 +29,13 @@ jobs:
         timeout: 10
         max-score: 1000
         setup-command: pip install pytest
+    - name: Run tests
+      id: run_tests
+      run: |
+        source venv/bin/activate
+        pytest --maxfail=1 --disable-warnings --json-report --json-report-file=results.json
+
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
-      env:
-        TEST_SESSION8_RESULTS: "${{steps.test_session8.outputs.result}}"
       with:
-        runners: test_session8
+        results: ${{ steps.run_tests.outputs.result }}
