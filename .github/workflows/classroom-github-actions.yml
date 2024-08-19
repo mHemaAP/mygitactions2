@@ -19,6 +19,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: test_session8
+      id: test_session8
+      uses: classroom-resources/autograding-python-grader@v1
+      with:
+        timeout: 10
+        max-score: 1000    
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
@@ -30,4 +36,4 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
     - name: Test with pytest
       run: |
-        python test_session8.py
+        pytest test_session8.py
